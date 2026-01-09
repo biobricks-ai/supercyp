@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 def main():
-    raw_path = Path("raw")
+    raw_path = Path("download")
     brick_path = Path("brick")
     brick_path.mkdir(exist_ok=True)
 

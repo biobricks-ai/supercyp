@@ -6,18 +6,10 @@ stages:
     outs:
       - download
 
-  unzip:
-    cmd: bash stages/02_unzip.sh
-    deps:
-      - stages/02_unzip.sh
-      - download
-    outs:
-      - raw
-
   build:
-    cmd: python stages/03_build.py
+    cmd: .venv/bin/python stages/03_build.py
     deps:
       - stages/03_build.py
-      - raw
+      - download
     outs:
       - brick

@@ -1,36 +1,25 @@
 #!/usr/bin/env bash
 
-# Script to download files
+# Script to download CYP450 drug metabolism data
+# Primary source: Curated CYP450 Interaction Dataset on Figshare
+# Contains data from SuperCYP, DrugBank, and other sources
+# https://figshare.com/articles/dataset/26630515
 
-# Get local path
+set -euo pipefail
+
 localpath=$(pwd)
 echo "Local path: $localpath"
 
-# Create the list directory to save list of remote files and directories
-listpath="$localpath/list"
-echo "List path: $listpath"
-mkdir -p $listpath
-cd $listpath;
-
-# Define the FTP base address
-export ftpbase=""
-
-# Retrieve the list of files to download from FTP base address
-wget --no-remove-listing $ftpbase
-cat index.html | grep -Po '(?<=href=")[^"]*' | sort | cut -d "/" -f 10 > files.txt
-rm .listing
-rm index.html
-
-# Create the download directory
-export downloadpath="$localpath/download"
-echo "Download path: $downloadpath"
+downloadpath="$localpath/download"
 mkdir -p "$downloadpath"
-cd $downloadpath;
 
-# Download files in parallel
-cat $listpath/files.txt | xargs -P14 -n1 bash -c '
-  echo $0
-  wget -nH -q -nc -P $downloadpath $ftpbase$0
-'
+echo "Downloading CYP450 interaction datasets..."
 
-echo "Download done."
+# Curated CYP450 Dataset from Figshare
+# Contains ~2000 compounds per CYP enzyme (CYP1A2, CYP2C9, CYP2C19, CYP2D6, CYP2E1, CYP3A4)
+wget -nv -O "$downloadpath/cyp450_curated.zip" \
+    "https://figshare.com/ndownloader/files/53278934" || \
+    echo "Warning: Could not download CYP450 curated dataset"
+
+echo "Download complete."
+ls -lh "$downloadpath"

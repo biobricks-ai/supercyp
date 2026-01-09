@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
 
-# Script to unzip files
+# Script to extract CYP450 dataset
 
-# Get local path
+set -euo pipefail
+
 localpath=$(pwd)
-echo "Local path: $localpath"
+downloadpath="$localpath/download"
+rawpath="$localpath/raw"
 
-# Set download path
-export downloadpath="$localpath/download"
-echo "Download path: $downloadpath"
+mkdir -p "$rawpath"
 
-# Set list path
-listpath="$localpath/list"
-echo "List path: $listpath"
+echo "Extracting CYP450 datasets..."
 
-# Create raw path
-export rawpath="$localpath/raw"
-mkdir -p $rawpath
-echo "Raw path: $rawpath"
+# Check if it's a zip file or directory of CSVs
+for file in "$downloadpath"/*; do
+    if [[ "$file" == *.zip ]]; then
+        echo "Extracting $(basename $file)..."
+        unzip -o -q "$file" -d "$rawpath"
+    elif [[ "$file" == *.csv ]]; then
+        cp "$file" "$rawpath/"
+    fi
+done
 
-# Unzip files in parallel
-cat $listpath/files.txt | tail -n +2 | xargs -P14 -n1 bash -c '
-  filename="${0%.*}"
-  echo $downloadpath/$0
-  echo $rawpath/$filename
-  unzip $downloadpath/$0 -d $rawpath/$filename
-'
+echo "Extraction complete."
+find "$rawpath" -type f | head -20
